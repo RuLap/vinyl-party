@@ -1,4 +1,4 @@
-package copier
+package user
 
 import (
 	"github.com/jinzhu/copier"
@@ -26,7 +26,7 @@ func LoginDTOToEntity(dto dto.UserLoginDTO) (entity.User, error) {
 	return user, nil
 }
 
-func EntityToShortDTO(user entity.User) (dto.UserShortInfoDTO, error) {
+func EntityToShortInfoDTO(user entity.User) (dto.UserShortInfoDTO, error) {
 	var shortInfoDTO dto.UserShortInfoDTO
 	err := copier.Copy(&shortInfoDTO, &user)
 	if err != nil {

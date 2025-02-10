@@ -6,7 +6,7 @@ type AlbumCreateDTO struct {
 	CoverUrl string `json:"cover_url"`
 }
 
-type AlbumShortDTO struct {
+type AlbumShortInfoDTO struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
 	Artist   string `json:"artist"`
