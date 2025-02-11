@@ -1,5 +1,6 @@
 enc: "dev"
 mongo_url: "mongodb://localhost:27017"
+db_name: "vinyl-party"
 http_server:
   address: "localhost:8083"
   timeout: 4s

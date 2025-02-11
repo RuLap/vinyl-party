@@ -1,21 +1,52 @@
 package main
 
 import (
-  "fmt"
+	"fmt"
+	"github.com/go-chi/chi/v5"
+	"net/http"
+	"vinyl-party/internal/config"
+	"vinyl-party/internal/handler/http/api"
+	"vinyl-party/internal/repository"
+	"vinyl-party/internal/service"
+	"vinyl-party/internal/storage/mongodb"
+	"vinyl-party/pkg/recovery"
 )
 
-//TIP <p>To run your code, right-click the code and select <b>Run</b>.</p> <p>Alternatively, click
-// the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
-
 func main() {
-  //TIP <p>Press <shortcut actionId="ShowIntentionActions"/> when your caret is at the underlined text
-  // to see how GoLand suggests fixing the warning.</p><p>Alternatively, if available, click the lightbulb to view possible fixes.</p>
-  s := "gopher"
-  fmt.Println("Hello and welcome, %s!", s)
+	cfg := config.MustLoad()
 
-  for i := 1; i <= 5; i++ {
-	//TIP <p>To start your debugging session, right-click your code in the editor and select the Debug option.</p> <p>We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-	// for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.</p>
-	fmt.Println("i =", 100/i)
-  }
+	http.HandleFunc("/panic", recovery.Middleware(panicHandler))
+
+	storage, err := mongodb.New(cfg.MongoURL, cfg.DbName)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(storage)
+
+	router := chi.NewRouter()
+
+	userRepo := repository.NewUserRepository(storage.Database())
+	userService := service.NewUserService(userRepo)
+	userHandler := api.NewUserHandler(userService)
+	router.Post("/users", userHandler.Register)
+	router.Post("/login", userHandler.Login)
+
+	server := &http.Server{
+		Addr:         cfg.Address,
+		Handler:      router,
+		ReadTimeout:  cfg.HTTPServer.Timeout,
+		WriteTimeout: cfg.HTTPServer.Timeout,
+		IdleTimeout:  cfg.HTTPServer.IdleTimeout,
+	}
+
+	if err := server.ListenAndServe(); err != nil {
+		fmt.Println(err)
+	}
+
+	http.ListenAndServe(cfg.Address, nil)
+}
+
+func panicHandler(w http.ResponseWriter, r *http.Request) {
+	panic("Something went wrong!")
 }

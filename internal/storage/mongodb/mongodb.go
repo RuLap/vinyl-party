@@ -10,12 +10,13 @@ import (
 )
 
 type Storage struct {
-	db *mongo.Client
+	client *mongo.Client
+	db     *mongo.Database
 }
 
 var client *mongo.Client
 
-func New(storagePath string) (*Storage, error) {
+func New(storagePath string, dbName string) (*Storage, error) {
 	const op = "storage.mongodb.New"
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -27,5 +28,14 @@ func New(storagePath string) (*Storage, error) {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return &Storage{db: client}, nil
+	db := client.Database(dbName)
+
+	return &Storage{
+		client: client,
+		db:     db,
+	}, nil
+}
+
+func (s *Storage) Database() *mongo.Database {
+	return s.db
 }
