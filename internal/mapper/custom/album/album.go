@@ -1,0 +1,37 @@
+package album
+
+import (
+	"vinyl-party/internal/dto"
+	"vinyl-party/internal/entity"
+)
+
+func CreateDTOToEntity(dto dto.AlbumCreateDTO) entity.Album {
+	return entity.Album{
+		Title:      dto.Title,
+		Artist:     dto.Artist,
+		CoverUrl:   dto.CoverUrl,
+		SpotifyUrl: dto.SpotifyUrl,
+	}
+}
+
+func EntityToShortInfoDTO(album entity.Album) dto.AlbumShortInfoDTO {
+	return dto.AlbumShortInfoDTO{
+		ID:         album.ID,
+		Title:      album.Title,
+		Artist:     album.Artist,
+		CoverUrl:   album.CoverUrl,
+		SpotifyUrl: album.SpotifyUrl,
+	}
+}
+
+func EntityToInfoDTO(album entity.Album, ratingDtos []dto.RatingInfoDTO, averageRating int) dto.AlbumInfoDTO {
+	return dto.AlbumInfoDTO{
+		ID:            album.ID,
+		Title:         album.Title,
+		Artist:        album.Artist,
+		CoverUrl:      album.Artist,
+		SpotifyUrl:    album.SpotifyUrl,
+		Ratings:       ratingDtos,
+		AverageRating: averageRating,
+	}
+}

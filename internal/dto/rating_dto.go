@@ -1,11 +1,14 @@
 package dto
 
+import "vinyl-party/internal/entity"
+
 type RatingCreateDTO struct {
-	UserID string `bson:"user_id"`
-	Score  int    `bson:"score"`
+	User  entity.User `json:"user"`
+	Score int         `json:"score"`
 }
 
 type RatingInfoDTO struct {
-	User  UserShortInfoDTO `bson:"user"`
-	Score int              `bson:"score"`
+	ID    string           `json:"id"`
+	User  UserShortInfoDTO `json:"user"`
+	Score int              `json:"score"`
 }
