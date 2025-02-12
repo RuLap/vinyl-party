@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"net/http"
 	"vinyl-party/internal/config"
 	"vinyl-party/internal/handler/http/api"
@@ -10,6 +9,8 @@ import (
 	"vinyl-party/internal/service"
 	"vinyl-party/internal/storage/mongodb"
 	"vinyl-party/pkg/recovery"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func main() {
@@ -29,6 +30,19 @@ func main() {
 	userRepo := repository.NewUserRepository(storage.Database())
 	userService := service.NewUserService(userRepo)
 	userHandler := api.NewUserHandler(userService)
+
+	ratingRepo := repository.NewRatingRepository(storage.Database())
+	ratingService := service.NewRatingService(ratingRepo)
+	fmt.Println(ratingService) // TODO: Add handler
+
+	albumRepo := repository.NewAlbumRepository(storage.Database())
+	albumService := service.NewAlbumService(albumRepo)
+	fmt.Println(albumService) // TODO: Add handler
+
+	partyRepo := repository.NewPartyRepository(storage.Database())
+	partySetvice := service.NewPartyService(partyRepo)
+	fmt.Println(partySetvice) // TODO: Add handler
+
 	router.Post("/users", userHandler.Register)
 	router.Post("/login", userHandler.Login)
 

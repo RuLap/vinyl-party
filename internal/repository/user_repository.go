@@ -2,9 +2,10 @@ package repository
 
 import (
 	"context"
+	"vinyl-party/internal/entity"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"vinyl-party/internal/entity"
 )
 
 type UserRepository interface {
@@ -13,22 +14,22 @@ type UserRepository interface {
 	FindByEmail(email string) (*entity.User, error)
 }
 
-type userRepo struct {
+type userRepository struct {
 	collection *mongo.Collection
 }
 
 func NewUserRepository(db *mongo.Database) UserRepository {
-	return &userRepo{
+	return &userRepository{
 		collection: db.Collection("users"),
 	}
 }
 
-func (r *userRepo) Create(user *entity.User) error {
+func (r *userRepository) Create(user *entity.User) error {
 	_, err := r.collection.InsertOne(context.Background(), user)
 	return err
 }
 
-func (r *userRepo) FindByID(id string) (*entity.User, error) {
+func (r *userRepository) FindByID(id string) (*entity.User, error) {
 	var user entity.User
 	err := r.collection.FindOne(context.Background(), bson.M{"_id": id}).Decode(&user)
 	if err != nil {
@@ -38,7 +39,7 @@ func (r *userRepo) FindByID(id string) (*entity.User, error) {
 	return &user, nil
 }
 
-func (r *userRepo) FindByEmail(email string) (*entity.User, error) {
+func (r *userRepository) FindByEmail(email string) (*entity.User, error) {
 	var user entity.User
 	err := r.collection.FindOne(context.Background(), bson.M{"email": email}).Decode(&user)
 	if err != nil {

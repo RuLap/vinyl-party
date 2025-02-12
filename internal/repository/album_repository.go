@@ -9,7 +9,7 @@ import (
 )
 
 type AlbumRepository interface {
-	Create(album entity.Album) error
+	Create(album *entity.Album) error
 	FindByID(id string) (*entity.Album, error)
 }
 
@@ -23,7 +23,7 @@ func NewAlbumRepository(db *mongo.Database) AlbumRepository {
 	}
 }
 
-func (r *albumRepository) Create(album entity.Album) error {
+func (r *albumRepository) Create(album *entity.Album) error {
 	_, err := r.collection.InsertOne(context.Background(), album)
 	return err
 }

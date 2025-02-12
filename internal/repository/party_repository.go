@@ -9,7 +9,7 @@ import (
 )
 
 type PartyRepository interface {
-	Create(party entity.Party) error
+	Create(party *entity.Party) error
 	FindByID(id string) (*entity.Party, error)
 }
 
@@ -23,7 +23,7 @@ func NewPartyRepository(db *mongo.Database) PartyRepository {
 	}
 }
 
-func (r *partyRepository) Create(party entity.Party) error {
+func (r *partyRepository) Create(party *entity.Party) error {
 	_, err := r.collection.InsertOne(context.Background(), party)
 	return err
 }
