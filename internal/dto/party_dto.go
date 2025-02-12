@@ -1,12 +1,10 @@
 package dto
 
-import "vinyl-party/internal/entity"
-
 type PartyCreateDTO struct {
-	Host        entity.User `json:"host_id"`
-	Title       string      `json:"title"`
-	Description string      `json:"description"`
-	Date        string      `json:"date"`
+	HostID      string `json:"host_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Date        string `json:"date"`
 }
 
 type PartyShortInfoDTO struct {

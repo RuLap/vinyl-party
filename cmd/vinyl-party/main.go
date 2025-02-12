@@ -41,10 +41,15 @@ func main() {
 
 	partyRepo := repository.NewPartyRepository(storage.Database())
 	partySetvice := service.NewPartyService(partyRepo)
-	fmt.Println(partySetvice) // TODO: Add handler
+	partyHandler := api.NewPartyHandler(partySetvice)
 
 	router.Post("/users", userHandler.Register)
 	router.Post("/login", userHandler.Login)
+
+	router.Post("/parties", partyHandler.CreateParty)
+	router.Get("/parties/{id}", partyHandler.GetPartyInfo)
+	router.Post("/parties/{id}/albums", partyHandler.AddAlbumToParty)
+	router.Post("/parties/{id}/participants", partyHandler.AddParticipantToParty)
 
 	server := &http.Server{
 		Addr:         cfg.Address,

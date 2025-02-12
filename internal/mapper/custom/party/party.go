@@ -5,9 +5,9 @@ import (
 	"vinyl-party/internal/entity"
 )
 
-func CreateDTOToEntity(dto dto.PartyCreateDTO, hostID string) entity.Party {
+func CreateDTOToEntity(dto dto.PartyCreateDTO) entity.Party {
 	return entity.Party{
-		HostID:      hostID,
+		HostID:      dto.HostID,
 		Title:       dto.Title,
 		Description: dto.Description,
 		Date:        dto.Date,
