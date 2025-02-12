@@ -10,6 +10,9 @@ import (
 type AlbumService interface {
 	Create(album entity.Album) error
 	GetByID(id string) (*entity.Album, error)
+	GetByIDs(ids []string) ([]entity.Album, error)
+	AddRating(albumID string, ratingID string) error
+	Delete(id string) error
 }
 
 type albumService struct {
@@ -32,4 +35,16 @@ func (s *albumService) GetByID(id string) (*entity.Album, error) {
 	}
 
 	return album, nil
+}
+
+func (s *albumService) GetByIDs(ids []string) ([]entity.Album, error) {
+	return s.albumRepo.GetByIDs(ids)
+}
+
+func (s *albumService) AddRating(albumID string, ratingID string) error {
+	return s.albumRepo.AddRating(albumID, ratingID)
+}
+
+func (s *albumService) Delete(id string) error {
+	return s.albumRepo.Delete(id)
 }
