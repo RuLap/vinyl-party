@@ -10,6 +10,8 @@ import (
 type PartyService interface {
 	Create(party *entity.Party) error
 	GetByID(id string) (*entity.Party, error)
+	AddAlbum(partyID string, albumID string) error
+	AddParticipant(partyID string, userID string) error
 }
 
 type partyService struct {
@@ -32,4 +34,12 @@ func (s *partyService) GetByID(id string) (*entity.Party, error) {
 	}
 
 	return party, nil
+}
+
+func (s *partyService) AddAlbum(partyID string, albumID string) error {
+	return s.partyRepo.AddAlbum(partyID, albumID)
+}
+
+func (s *partyService) AddParticipant(partyID string, userID string) error {
+	return s.partyRepo.AddParticipant(partyID, userID)
 }
