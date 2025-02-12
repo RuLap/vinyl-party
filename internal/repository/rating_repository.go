@@ -10,7 +10,7 @@ import (
 
 type RatingRepository interface {
 	Create(rating *entity.Rating) error
-	FindByID(id string) (*entity.Rating, error)
+	GetByID(id string) (*entity.Rating, error)
 }
 
 type ratingRepository struct {
@@ -28,7 +28,7 @@ func (r *ratingRepository) Create(rating *entity.Rating) error {
 	return err
 }
 
-func (r *ratingRepository) FindByID(id string) (*entity.Rating, error) {
+func (r *ratingRepository) GetByID(id string) (*entity.Rating, error) {
 	var rating entity.Rating
 	err := r.collection.FindOne(context.Background(), bson.M{"_id": id}).Decode(&rating)
 	if err != nil {

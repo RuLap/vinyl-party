@@ -10,8 +10,8 @@ import (
 
 type UserRepository interface {
 	Create(user *entity.User) error
-	FindByID(id string) (*entity.User, error)
-	FindByEmail(email string) (*entity.User, error)
+	GetByID(id string) (*entity.User, error)
+	GetByEmail(email string) (*entity.User, error)
 }
 
 type userRepository struct {
@@ -29,7 +29,7 @@ func (r *userRepository) Create(user *entity.User) error {
 	return err
 }
 
-func (r *userRepository) FindByID(id string) (*entity.User, error) {
+func (r *userRepository) GetByID(id string) (*entity.User, error) {
 	var user entity.User
 	err := r.collection.FindOne(context.Background(), bson.M{"_id": id}).Decode(&user)
 	if err != nil {
@@ -39,7 +39,7 @@ func (r *userRepository) FindByID(id string) (*entity.User, error) {
 	return &user, nil
 }
 
-func (r *userRepository) FindByEmail(email string) (*entity.User, error) {
+func (r *userRepository) GetByEmail(email string) (*entity.User, error) {
 	var user entity.User
 	err := r.collection.FindOne(context.Background(), bson.M{"email": email}).Decode(&user)
 	if err != nil {

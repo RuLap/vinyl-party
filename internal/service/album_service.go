@@ -9,7 +9,7 @@ import (
 
 type AlbumService interface {
 	Create(album entity.Album) error
-	FindByID(id string) (*entity.Album, error)
+	GetByID(id string) (*entity.Album, error)
 }
 
 type albumService struct {
@@ -25,8 +25,8 @@ func (s *albumService) Create(album entity.Album) error {
 	return s.albumRepo.Create(&album)
 }
 
-func (s *albumService) FindByID(id string) (*entity.Album, error) {
-	album, err := s.albumRepo.FindByID(id)
+func (s *albumService) GetByID(id string) (*entity.Album, error) {
+	album, err := s.albumRepo.GetByID(id)
 	if err != nil {
 		return nil, err
 	}

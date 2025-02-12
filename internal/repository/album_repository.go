@@ -10,7 +10,7 @@ import (
 
 type AlbumRepository interface {
 	Create(album *entity.Album) error
-	FindByID(id string) (*entity.Album, error)
+	GetByID(id string) (*entity.Album, error)
 }
 
 type albumRepository struct {
@@ -28,7 +28,7 @@ func (r *albumRepository) Create(album *entity.Album) error {
 	return err
 }
 
-func (r *albumRepository) FindByID(id string) (*entity.Album, error) {
+func (r *albumRepository) GetByID(id string) (*entity.Album, error) {
 	var album entity.Album
 	err := r.collection.FindOne(context.Background(), bson.M{"_id": id}).Decode(&album)
 	if err != nil {

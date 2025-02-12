@@ -10,7 +10,7 @@ import (
 
 type PartyRepository interface {
 	Create(party *entity.Party) error
-	FindByID(id string) (*entity.Party, error)
+	GetByID(id string) (*entity.Party, error)
 }
 
 type partyRepository struct {
@@ -28,7 +28,7 @@ func (r *partyRepository) Create(party *entity.Party) error {
 	return err
 }
 
-func (r *partyRepository) FindByID(id string) (*entity.Party, error) {
+func (r *partyRepository) GetByID(id string) (*entity.Party, error) {
 	var party entity.Party
 	err := r.collection.FindOne(context.Background(), bson.M{"_id": id}).Decode(&party)
 	if err != nil {

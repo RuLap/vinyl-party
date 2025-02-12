@@ -9,7 +9,7 @@ import (
 
 type PartyService interface {
 	Create(party *entity.Party) error
-	FindByID(id string) (*entity.Party, error)
+	GetByID(id string) (*entity.Party, error)
 }
 
 type partyService struct {
@@ -25,8 +25,8 @@ func (s *partyService) Create(party *entity.Party) error {
 	return s.partyRepo.Create(party)
 }
 
-func (s *partyService) FindByID(id string) (*entity.Party, error) {
-	party, err := s.partyRepo.FindByID(id)
+func (s *partyService) GetByID(id string) (*entity.Party, error) {
+	party, err := s.partyRepo.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
