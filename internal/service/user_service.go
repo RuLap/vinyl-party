@@ -2,9 +2,11 @@ package service
 
 import (
 	"errors"
-	"golang.org/x/crypto/bcrypt"
 	"vinyl-party/internal/entity"
 	"vinyl-party/internal/repository"
+
+	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -34,6 +36,7 @@ func (s *userService) Register(user *entity.User) error {
 		return ErrEmailExists
 	}
 
+	user.ID = uuid.NewString()
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
