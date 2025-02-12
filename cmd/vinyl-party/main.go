@@ -33,11 +33,11 @@ func main() {
 
 	ratingRepo := repository.NewRatingRepository(storage.Database())
 	ratingService := service.NewRatingService(ratingRepo)
-	fmt.Println(ratingService) // TODO: Add handler
+	ratingHandler := api.NewRatingHandler(ratingService)
 
 	albumRepo := repository.NewAlbumRepository(storage.Database())
 	albumService := service.NewAlbumService(albumRepo)
-	fmt.Println(albumService) // TODO: Add handler
+	albumHandler := api.NewAlbumHandler(albumService)
 
 	partyRepo := repository.NewPartyRepository(storage.Database())
 	partySetvice := service.NewPartyService(partyRepo)
@@ -45,6 +45,14 @@ func main() {
 
 	router.Post("/users", userHandler.Register)
 	router.Post("/login", userHandler.Login)
+
+	router.Post("/ratings", ratingHandler.CreateRating)
+	router.Get("/ratings/{id}", ratingHandler.GetRatingByID)
+
+	router.Post("/", albumHandler.CreateAlbum)
+	router.Get("/{id}", albumHandler.GetAlbumByID)
+	router.Delete("/{id}", albumHandler.DeleteAlbum)
+	router.Post("/{id}/ratings", albumHandler.AddRating)
 
 	router.Post("/parties", partyHandler.CreateParty)
 	router.Get("/parties/{id}", partyHandler.GetPartyInfo)
