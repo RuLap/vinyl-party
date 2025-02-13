@@ -29,7 +29,7 @@ func EntityToInfoDTO(album *entity.Album, ratingDTOs []dto.RatingInfoDTO, averag
 		ID:            album.ID,
 		Title:         album.Title,
 		Artist:        album.Artist,
-		CoverUrl:      album.Artist,
+		CoverUrl:      album.CoverUrl,
 		SpotifyUrl:    album.SpotifyUrl,
 		Ratings:       ratingDTOs,
 		AverageRating: averageRating,

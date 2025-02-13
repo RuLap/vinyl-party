@@ -50,7 +50,7 @@ func (r *albumRepository) GetByIDs(ids []string) ([]*entity.Album, error) {
 		return nil, err
 	}
 
-	err = cursor.All(context.Background(), albums)
+	err = cursor.All(context.Background(), &albums)
 	return albums, err
 }
 

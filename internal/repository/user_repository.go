@@ -42,23 +42,14 @@ func (r *userRepository) GetByID(id string) (*entity.User, error) {
 
 func (r *userRepository) GetByIDs(ids []string) ([]*entity.User, error) {
 	var users []*entity.User
-	cursor, err := r.collection.Find(context.Background(), bson.M{"_id": bson.M{"$in": ids}})
+	filter := bson.M{"_id": bson.M{"$in": ids}}
+	cursor, err := r.collection.Find(context.Background(), filter)
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(context.Background())
-	for cursor.Next(context.Background()) {
-		var user entity.User
-		err := cursor.Decode(&user)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if err := cursor.Err(); err != nil {
-		return nil, err
-	}
 
-	return users, nil
+	err = cursor.All(context.Background(), &users)
+	return users, err
 }
 
 func (r *userRepository) GetByEmail(email string) (*entity.User, error) {
