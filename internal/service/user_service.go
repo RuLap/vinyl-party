@@ -19,6 +19,7 @@ type UserService interface {
 	Register(user *entity.User) error
 	Login(email string, password string) (*entity.User, error)
 	GetByID(id string) (*entity.User, error)
+	GetByIDs(ids []string) ([]*entity.User, error)
 	GetByEmail(email string) (*entity.User, error)
 }
 
@@ -66,6 +67,15 @@ func (s *userService) GetByID(id string) (*entity.User, error) {
 	}
 
 	return user, nil
+}
+
+func (s *userService) GetByIDs(ids []string) ([]*entity.User, error) {
+	users, err := s.userRepo.GetByIDs(ids)
+	if err != nil {
+		return nil, ErrUserNotFound
+	}
+
+	return users, nil
 }
 
 func (s *userService) GetByEmail(email string) (*entity.User, error) {

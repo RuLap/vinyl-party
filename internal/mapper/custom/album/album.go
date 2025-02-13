@@ -24,14 +24,23 @@ func EntityToShortInfoDTO(album entity.Album) dto.AlbumShortInfoDTO {
 	}
 }
 
-func EntityToInfoDTO(album entity.Album, ratingDtos []dto.RatingInfoDTO, averageRating int) dto.AlbumInfoDTO {
+func EntityToInfoDTO(album *entity.Album, ratingDTOs []dto.RatingInfoDTO, averageRating int) dto.AlbumInfoDTO {
 	return dto.AlbumInfoDTO{
 		ID:            album.ID,
 		Title:         album.Title,
 		Artist:        album.Artist,
 		CoverUrl:      album.Artist,
 		SpotifyUrl:    album.SpotifyUrl,
-		Ratings:       ratingDtos,
+		Ratings:       ratingDTOs,
 		AverageRating: averageRating,
+	}
+}
+
+func SpotifyDTOToEntity(album *entity.SpotifyAlbum) entity.Album {
+	return entity.Album{
+		Title:      album.Name,
+		Artist:     album.ArtistsString,
+		CoverUrl:   album.CoverUrl,
+		SpotifyUrl: album.Url,
 	}
 }

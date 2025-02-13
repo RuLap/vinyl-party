@@ -11,6 +11,7 @@ import (
 type UserRepository interface {
 	Create(user *entity.User) error
 	GetByID(id string) (*entity.User, error)
+	GetByIDs(ids []string) ([]*entity.User, error)
 	GetByEmail(email string) (*entity.User, error)
 }
 
@@ -37,6 +38,27 @@ func (r *userRepository) GetByID(id string) (*entity.User, error) {
 	}
 
 	return &user, nil
+}
+
+func (r *userRepository) GetByIDs(ids []string) ([]*entity.User, error) {
+	var users []*entity.User
+	cursor, err := r.collection.Find(context.Background(), bson.M{"_id": bson.M{"$in": ids}})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var user entity.User
+		err := cursor.Decode(&user)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }
 
 func (r *userRepository) GetByEmail(email string) (*entity.User, error) {

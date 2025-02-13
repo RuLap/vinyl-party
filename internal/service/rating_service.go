@@ -10,6 +10,7 @@ import (
 type RatingService interface {
 	Create(rating *entity.Rating) error
 	GetByID(id string) (*entity.Rating, error)
+	GetByIDs(ids []string) ([]*entity.Rating, error)
 }
 
 type ratingService struct {
@@ -37,4 +38,13 @@ func (s *ratingService) GetByID(id string) (*entity.Rating, error) {
 	}
 
 	return rating, nil
+}
+
+func (s *ratingService) GetByIDs(ids []string) ([]*entity.Rating, error) {
+	ratings, err := s.ratingRepo.GetByIDs(ids)
+	if err != nil {
+		return nil, err
+	}
+
+	return ratings, nil
 }

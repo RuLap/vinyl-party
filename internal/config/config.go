@@ -9,16 +9,30 @@ import (
 )
 
 type Config struct {
-	Env        string `yaml:"env" env-default:"local"`
-	MongoURL   string `yaml:"mongo_url" env-required:"true"`
-	DbName     string `yaml:"db_name" env-required:"true"`
-	HTTPServer `yaml:"http_server"`
+	Env                string `yaml:"env" env-default:"local"`
+	MongoURL           string `yaml:"mongo_url" env-required:"true"`
+	DbName             string `yaml:"db_name" env-required:"true"`
+	HTTPServer         `yaml:"http_server"`
+	ProxyServer        `yaml:"proxy_server"`
+	SpotifyCredentials `yaml:"spotify_credentials"`
 }
 
 type HTTPServer struct {
 	Address     string        `yaml:"address" env-default:"localhost:8080"`
 	Timeout     time.Duration `yaml:"timeout" enc-default:"4s"`
 	IdleTimeout time.Duration `yaml:"idle_timeout" enc-default:"60s"`
+}
+
+type ProxyServer struct {
+	Address  string        `yaml:"address" env-required:"true"`
+	Username string        `yaml:"username" env-required:"true"`
+	Password string        `yaml:"password" env-required:"true"`
+	Timeout  time.Duration `yaml:"timeout" enc-default:"10s"`
+}
+
+type SpotifyCredentials struct {
+	ClientID     string `yaml:"client_id" env-required:"true"`
+	ClientSecret string `yaml:"client_secret" env-required:"true"`
 }
 
 func MustLoad() *Config {

@@ -27,6 +27,11 @@ func main() {
 
 	router := chi.NewRouter()
 
+	spotifyService, err := service.NewSpotifyService(cfg.ProxyServer, cfg.SpotifyCredentials)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	userRepo := repository.NewUserRepository(storage.Database())
 	userService := service.NewUserService(userRepo)
 	userHandler := api.NewUserHandler(userService)
@@ -40,8 +45,8 @@ func main() {
 	albumHandler := api.NewAlbumHandler(albumService)
 
 	partyRepo := repository.NewPartyRepository(storage.Database())
-	partySetvice := service.NewPartyService(partyRepo)
-	partyHandler := api.NewPartyHandler(partySetvice)
+	partyService := service.NewPartyService(partyRepo)
+	partyHandler := api.NewPartyHandler(partyService, userService, albumService, ratingService, spotifyService)
 
 	router.Post("/users", userHandler.Register)
 	router.Post("/login", userHandler.Login)
@@ -49,18 +54,19 @@ func main() {
 	router.Post("/ratings", ratingHandler.CreateRating)
 	router.Get("/ratings/{id}", ratingHandler.GetRatingByID)
 
-	router.Post("/", albumHandler.CreateAlbum)
-	router.Get("/{id}", albumHandler.GetAlbumByID)
-	router.Delete("/{id}", albumHandler.DeleteAlbum)
-	router.Post("/{id}/ratings", albumHandler.AddRating)
+	router.Post("/albums", albumHandler.CreateAlbum)
+	router.Get("/albums/{id}", albumHandler.GetAlbumByID)
+	router.Delete("/albums/{id}", albumHandler.DeleteAlbum)
+	router.Post("/albums/{id}/ratings", albumHandler.AddRating)
 
+	router.Get("/parties", partyHandler.GetAllParties)
 	router.Post("/parties", partyHandler.CreateParty)
 	router.Get("/parties/{id}", partyHandler.GetPartyInfo)
 	router.Post("/parties/{id}/albums", partyHandler.AddAlbumToParty)
 	router.Post("/parties/{id}/participants", partyHandler.AddParticipantToParty)
 
 	server := &http.Server{
-		Addr:         cfg.Address,
+		Addr:         cfg.HTTPServer.Address,
 		Handler:      router,
 		ReadTimeout:  cfg.HTTPServer.Timeout,
 		WriteTimeout: cfg.HTTPServer.Timeout,
@@ -70,8 +76,6 @@ func main() {
 	if err := server.ListenAndServe(); err != nil {
 		fmt.Println(err)
 	}
-
-	http.ListenAndServe(cfg.Address, nil)
 }
 
 func panicHandler(w http.ResponseWriter, r *http.Request) {

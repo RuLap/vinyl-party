@@ -12,7 +12,7 @@ import (
 type AlbumRepository interface {
 	Create(album *entity.Album) error
 	GetByID(id string) (*entity.Album, error)
-	GetByIDs(ids []string) ([]entity.Album, error)
+	GetByIDs(ids []string) ([]*entity.Album, error)
 	AddRating(albumID string, ratingID string) error
 	Delete(id string) error
 }
@@ -42,15 +42,15 @@ func (r *albumRepository) GetByID(id string) (*entity.Album, error) {
 	return &album, nil
 }
 
-func (r *albumRepository) GetByIDs(ids []string) ([]entity.Album, error) {
-	var albums []entity.Album
+func (r *albumRepository) GetByIDs(ids []string) ([]*entity.Album, error) {
+	var albums []*entity.Album
 	filter := bson.M{"_id": bson.M{"$in": ids}}
 	cursor, err := r.collection.Find(context.Background(), filter)
 	if err != nil {
 		return nil, err
 	}
 
-	err = cursor.All(context.Background(), &albums)
+	err = cursor.All(context.Background(), albums)
 	return albums, err
 }
 

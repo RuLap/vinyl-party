@@ -11,6 +11,7 @@ import (
 
 type PartyRepository interface {
 	Create(party *entity.Party) error
+	GetAll() ([]*entity.Party, error)
 	GetByID(id string) (*entity.Party, error)
 	AddAlbum(partyID string, albumID string) error
 	AddParticipant(partyID string, userID string) error
@@ -29,6 +30,20 @@ func NewPartyRepository(db *mongo.Database) PartyRepository {
 func (r *partyRepository) Create(party *entity.Party) error {
 	_, err := r.collection.InsertOne(context.Background(), party)
 	return err
+}
+
+func (r *partyRepository) GetAll() ([]*entity.Party, error) {
+	var parties []*entity.Party
+	cursor, err := r.collection.Find(context.Background(), bson.M{})
+	if err != nil {
+		return nil, err
+	}
+
+	if err := cursor.All(context.Background(), &parties); err != nil {
+		return nil, err
+	}
+
+	return parties, nil
 }
 
 func (r *partyRepository) GetByID(id string) (*entity.Party, error) {

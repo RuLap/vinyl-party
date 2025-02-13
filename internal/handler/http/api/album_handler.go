@@ -3,8 +3,9 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"vinyl-party/internal/dto"
 
-	"vinyl-party/internal/entity"
+	album_mapper "vinyl-party/internal/mapper/custom/album"
 	"vinyl-party/internal/service"
 
 	"github.com/go-chi/chi/v5"
@@ -19,13 +20,15 @@ func NewAlbumHandler(albumService service.AlbumService) *AlbumHandler {
 }
 
 func (h *AlbumHandler) CreateAlbum(w http.ResponseWriter, r *http.Request) {
-	var album entity.Album
-	if err := json.NewDecoder(r.Body).Decode(&album); err != nil {
+	var req dto.AlbumCreateDTO
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
 
-	if err := h.albumService.Create(album); err != nil {
+	album := album_mapper.CreateDTOToEntity(req)
+
+	if _, err := h.albumService.Create(&album); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -47,7 +50,9 @@ func (h *AlbumHandler) GetAlbumByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(album)
+	albumDTO := album_mapper.EntityToShortInfoDTO(*album)
+
+	json.NewEncoder(w).Encode(albumDTO)
 }
 
 func (h *AlbumHandler) DeleteAlbum(w http.ResponseWriter, r *http.Request) {

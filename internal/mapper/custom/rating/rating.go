@@ -5,16 +5,16 @@ import (
 	"vinyl-party/internal/entity"
 )
 
-func CreateDTOToEntity(dto dto.RatingCreateDTO, userID string) entity.Rating {
+func CreateDTOToEntity(dto dto.RatingCreateDTO) entity.Rating {
 	return entity.Rating{
-		UserID: userID,
+		UserID: dto.UserID,
 		Score:  dto.Score,
 	}
 }
 
-func EntityToInfoDTO(rating entity.Rating, userDto dto.UserShortInfoDTO) dto.RatingInfoDTO {
+func EntityToInfoDTO(rating entity.Rating, userDTO dto.UserShortInfoDTO) dto.RatingInfoDTO {
 	return dto.RatingInfoDTO{
-		User:  userDto,
+		User:  userDTO,
 		Score: rating.Score,
 	}
 }

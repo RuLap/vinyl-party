@@ -3,8 +3,9 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"vinyl-party/internal/dto"
 
-	"vinyl-party/internal/entity"
+	rating_mapper "vinyl-party/internal/mapper/custom/rating"
 	"vinyl-party/internal/service"
 
 	"github.com/go-chi/chi/v5"
@@ -21,11 +22,13 @@ func NewRatingHandler(ratingService service.RatingService) *RatingHandler {
 }
 
 func (h *RatingHandler) CreateRating(w http.ResponseWriter, r *http.Request) {
-	var rating entity.Rating
-	if err := json.NewDecoder(r.Body).Decode(&rating); err != nil {
+	var req dto.RatingCreateDTO
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Неверный формат данных", http.StatusBadRequest)
 		return
 	}
+
+	rating := rating_mapper.CreateDTOToEntity(req)
 
 	if err := h.ratingService.Create(&rating); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
