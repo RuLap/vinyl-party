@@ -25,4 +25,4 @@ go.work.sum
 .idea
 
 #config
-config
+config/*.yaml
