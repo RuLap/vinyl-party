@@ -6,6 +6,5 @@ type Party struct {
 	Title           string   `bson:"title"`
 	Description     string   `bson:"description"`
 	Date            string   `bson:"date"`
-	AlbumsIDs       []string `bson:"album_ids"`
-	ParticipantsIDs []string `bson:"participant_ids"`
+	ParticipantsIDs []string `bson:"participant_ids"` // TODO: Move this to participant
 }

@@ -11,7 +11,7 @@ import (
 type RatingRepository interface {
 	Create(rating *entity.Rating) error
 	GetByID(id string) (*entity.Rating, error)
-	GetByIDs(ids []string) ([]*entity.Rating, error)
+	GetByAlbumID(albumID string) ([]*entity.Rating, error)
 }
 
 type ratingRepository struct {
@@ -39,15 +39,14 @@ func (r *ratingRepository) GetByID(id string) (*entity.Rating, error) {
 	return &rating, nil
 }
 
-func (r *ratingRepository) GetByIDs(ids []string) ([]*entity.Rating, error) {
+func (r *ratingRepository) GetByAlbumID(albumID string) ([]*entity.Rating, error) {
 	var ratings []*entity.Rating
-	cursor, err := r.collection.Find(context.Background(), bson.M{"_id": bson.M{"$in": ids}})
+	cursor, err := r.collection.Find(context.Background(), bson.M{"album_id": albumID})
 	if err != nil {
 		return nil, err
 	}
-	if err = cursor.All(context.Background(), &ratings); err != nil {
-		return nil, err
-	}
+
+	cursor.All(context.Background(), &ratings)
 
 	return ratings, nil
 }

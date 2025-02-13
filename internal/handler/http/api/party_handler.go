@@ -16,25 +16,31 @@ import (
 )
 
 type PartyHandler struct {
-	partyService   service.PartyService
-	userService    service.UserService
-	albumService   service.AlbumService
-	ratingService  service.RatingService
-	spotifyService service.SpotifyService
+	userService        service.UserService
+	albumService       service.AlbumService
+	partyService       service.PartyService
+	ratingService      service.RatingService
+	spotifyService     service.SpotifyService
+	partyRoleService   service.PartyRoleService
+	participantService service.ParticipantService
 }
 
 func NewPartyHandler(
-	partyService service.PartyService,
 	userService service.UserService,
 	albumService service.AlbumService,
+	partyService service.PartyService,
 	ratingService service.RatingService,
-	spotifyService service.SpotifyService) *PartyHandler {
+	spotifyService service.SpotifyService,
+	partyRoleService service.PartyRoleService,
+	participantService service.ParticipantService) *PartyHandler {
 	return &PartyHandler{
-		partyService:   partyService,
-		userService:    userService,
-		albumService:   albumService,
-		ratingService:  ratingService,
-		spotifyService: spotifyService,
+		userService:        userService,
+		albumService:       albumService,
+		partyService:       partyService,
+		ratingService:      ratingService,
+		spotifyService:     spotifyService,
+		partyRoleService:   partyRoleService,
+		participantService: participantService,
 	}
 }
 
@@ -45,6 +51,7 @@ func (h *PartyHandler) CreateParty(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	h.partyRoleService.Create(&entity.PartyRole{}) // TODO: потом будет присвоение роли для participant
 	party := party_mapper.CreateDTOToEntity(req)
 	err := h.partyService.Create(&party)
 	if err != nil {
@@ -93,14 +100,14 @@ func (h *PartyHandler) GetPartyInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PartyHandler) getPartyAlbumDTOs(w http.ResponseWriter, party *entity.Party) []dto.AlbumInfoDTO {
-	albums, err := h.albumService.GetByIDs(party.AlbumsIDs)
+	albums, err := h.albumService.GetByPartyID(party.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	albumDTOs := make([]dto.AlbumInfoDTO, 0)
 	if len(albums) != 0 {
 		for _, album := range albums {
-			ratings, err := h.ratingService.GetByIDs(album.RaitngIDs)
+			ratings, err := h.ratingService.GetByAlbumID(album.ID)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
@@ -165,7 +172,7 @@ func (h *PartyHandler) AddAlbumToParty(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	albums, err := h.albumService.GetByIDs(party.AlbumsIDs)
+	albums, err := h.albumService.GetByPartyID(party.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

@@ -25,27 +25,16 @@ func NewPartyService(partyRepo repository.PartyRepository) PartyService {
 
 func (s *partyService) Create(party *entity.Party) error {
 	party.ID = uuid.NewString()
-	party.AlbumsIDs = []string{}
 	party.ParticipantsIDs = []string{}
 	return s.partyRepo.Create(party)
 }
 
 func (s *partyService) GetAll() ([]*entity.Party, error) {
-	parties, err := s.partyRepo.GetAll()
-	if err != nil {
-		return nil, err
-	}
-
-	return parties, nil
+	return s.partyRepo.GetAll()
 }
 
 func (s *partyService) GetByID(id string) (*entity.Party, error) {
-	party, err := s.partyRepo.GetByID(id)
-	if err != nil {
-		return nil, err
-	}
-
-	return party, nil
+	return s.partyRepo.GetByID(id)
 }
 
 func (s *partyService) AddAlbum(partyID string, albumID string) error {

@@ -33,20 +33,23 @@ func main() {
 	}
 
 	userRepo := repository.NewUserRepository(storage.Database())
-	userService := service.NewUserService(userRepo)
-	userHandler := api.NewUserHandler(userService)
-
-	ratingRepo := repository.NewRatingRepository(storage.Database())
-	ratingService := service.NewRatingService(ratingRepo)
-	ratingHandler := api.NewRatingHandler(ratingService)
-
 	albumRepo := repository.NewAlbumRepository(storage.Database())
-	albumService := service.NewAlbumService(albumRepo)
-	albumHandler := api.NewAlbumHandler(albumService)
-
 	partyRepo := repository.NewPartyRepository(storage.Database())
+	ratingRepo := repository.NewRatingRepository(storage.Database())
+	partyRoleRepo := repository.NewPartyRoleRepository(storage.Database())
+	participantRepo := repository.NewParticipantRepository(storage.Database())
+
+	userService := service.NewUserService(userRepo)
+	albumService := service.NewAlbumService(albumRepo)
 	partyService := service.NewPartyService(partyRepo)
-	partyHandler := api.NewPartyHandler(partyService, userService, albumService, ratingService, spotifyService)
+	ratingService := service.NewRatingService(ratingRepo)
+	partyRoleService := service.NewPartyRoleService(partyRoleRepo)
+	participantService := service.NewParticipantService(participantRepo)
+
+	userHandler := api.NewUserHandler(userService)
+	albumHandler := api.NewAlbumHandler(albumService)
+	ratingHandler := api.NewRatingHandler(ratingService)
+	partyHandler := api.NewPartyHandler(userService, albumService, partyService, ratingService, spotifyService, partyRoleService, participantService)
 
 	router.Post("/users", userHandler.Register)
 	router.Post("/login", userHandler.Login)

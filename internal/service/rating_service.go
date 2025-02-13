@@ -10,7 +10,7 @@ import (
 type RatingService interface {
 	Create(rating *entity.Rating) error
 	GetByID(id string) (*entity.Rating, error)
-	GetByIDs(ids []string) ([]*entity.Rating, error)
+	GetByAlbumID(albumID string) ([]*entity.Rating, error)
 }
 
 type ratingService struct {
@@ -32,19 +32,9 @@ func (s *ratingService) Create(rating *entity.Rating) error {
 }
 
 func (s *ratingService) GetByID(id string) (*entity.Rating, error) {
-	rating, err := s.ratingRepo.GetByID(id)
-	if err != nil {
-		return nil, err
-	}
-
-	return rating, nil
+	return s.ratingRepo.GetByID(id)
 }
 
-func (s *ratingService) GetByIDs(ids []string) ([]*entity.Rating, error) {
-	ratings, err := s.ratingRepo.GetByIDs(ids)
-	if err != nil {
-		return nil, err
-	}
-
-	return ratings, nil
+func (s *ratingService) GetByAlbumID(albumID string) ([]*entity.Rating, error) {
+	return s.ratingRepo.GetByAlbumID(albumID)
 }

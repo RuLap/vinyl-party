@@ -61,28 +61,13 @@ func (s *userService) Login(email string, password string) (*entity.User, error)
 }
 
 func (s *userService) GetByID(id string) (*entity.User, error) {
-	user, err := s.userRepo.GetByID(id)
-	if err != nil {
-		return nil, ErrUserNotFound
-	}
-
-	return user, nil
+	return s.userRepo.GetByID(id)
 }
 
 func (s *userService) GetByIDs(ids []string) ([]*entity.User, error) {
-	users, err := s.userRepo.GetByIDs(ids)
-	if err != nil {
-		return nil, ErrUserNotFound
-	}
-
-	return users, nil
+	return s.userRepo.GetByIDs(ids)
 }
 
 func (s *userService) GetByEmail(email string) (*entity.User, error) {
-	user, err := s.userRepo.GetByEmail(email)
-	if err != nil {
-		return nil, ErrUserNotFound
-	}
-
-	return user, nil
+	return s.userRepo.GetByEmail(email)
 }
