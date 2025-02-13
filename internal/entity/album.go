@@ -6,5 +6,5 @@ type Album struct {
 	Artist     string `bson:"artist"`
 	CoverUrl   string `bson:"cover_url"`
 	SpotifyUrl string `bson:"spotify_url"`
-	PartyID    string `bson:"party_id`
+	PartyID    string `bson:"party_id"`
 }

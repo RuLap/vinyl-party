@@ -4,9 +4,9 @@ type SpotifyAlbum struct {
 	Name          string             `json:"name"`
 	Artists       []SpotifyArtist    `json:"artists"`
 	Images        []SpotifyItemImage `json:"images"`
-	ArtistsString string             `json:"artists_string;omitempty"`
-	CoverUrl      string             `json:"cover_url;omitempty"`
-	Url           string             `json:"url;omitempty"`
+	ArtistsString string             `json:"artists_string";omitempty`
+	CoverUrl      string             `json:"cover_url";omitempty`
+	Url           string             `json:"url";omitempty`
 }
 
 type SpotifyAccessToken struct {
