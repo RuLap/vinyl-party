@@ -86,15 +86,10 @@ func (h *PartyHandler) GetPartyInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	host, err := h.userService.GetByID(party.HostID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
-	}
-	hostDTO := user_mapper.EntityToShortInfoDTO(*host)
 	albumDTOs := h.getPartyAlbumDTOs(w, party)
 	participantDTOs := h.getPartyParticipantDTOs(w, party)
 
-	partyDTO := party_mapper.EntityToInfoDTO(*party, hostDTO, albumDTOs, participantDTOs)
+	partyDTO := party_mapper.EntityToInfoDTO(*party, albumDTOs, participantDTOs)
 
 	json.NewEncoder(w).Encode(partyDTO)
 }
