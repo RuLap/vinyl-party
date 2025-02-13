@@ -11,6 +11,7 @@ import (
 type ParticipantRepository interface {
 	Create(participant *entity.Participant) error
 	GetByID(id string) (*entity.Participant, error)
+	GetByPartyID(partyID string) ([]*entity.Participant, error)
 }
 
 type participantRepository struct {
@@ -34,4 +35,17 @@ func (r *participantRepository) GetByID(id string) (*entity.Participant, error) 
 	}
 
 	return &participant, nil
+}
+
+func (r *participantRepository) GetByPartyID(partyID string) ([]*entity.Participant, error) {
+	var participants []*entity.Participant
+	cursor, err := r.collection.Find(context.Background(), bson.M{"party_id": partyID})
+	if err != nil {
+		return nil, err
+	}
+	if err = cursor.All(context.Background(), &participants); err != nil {
+		return nil, err
+	}
+	
+	return participants, nil
 }

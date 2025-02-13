@@ -22,7 +22,7 @@ func EntityToShortInfoDTO(party entity.Party) dto.PartyShortInfoDTO {
 	}
 }
 
-func EntityToInfoDTO(party entity.Party, albumDTOs []dto.AlbumInfoDTO, participantDTOs []dto.UserShortInfoDTO) dto.PartyInfoDTO {
+func EntityToInfoDTO(party entity.Party, albumDTOs []dto.AlbumInfoDTO, participantDTOs []dto.ParticipantInfoDTO) dto.PartyInfoDTO {
 	return dto.PartyInfoDTO{
 		ID:           party.ID,
 		Title:        party.Title,

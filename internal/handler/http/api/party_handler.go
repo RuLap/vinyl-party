@@ -2,12 +2,15 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/google/uuid"
 	"net/http"
 	"vinyl-party/internal/entity"
 
 	"vinyl-party/internal/dto"
 	album_mapper "vinyl-party/internal/mapper/custom/album"
+	participant_mapper "vinyl-party/internal/mapper/custom/participant"
 	party_mapper "vinyl-party/internal/mapper/custom/party"
+	party_role_mapper "vinyl-party/internal/mapper/custom/party_role"
 	rating_mapper "vinyl-party/internal/mapper/custom/rating"
 	user_mapper "vinyl-party/internal/mapper/custom/user"
 	"vinyl-party/internal/service"
@@ -51,12 +54,32 @@ func (h *PartyHandler) CreateParty(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.partyRoleService.Create(&entity.PartyRole{}) // TODO: потом будет присвоение роли для participant
+	user, err := h.userService.GetByID(req.HostID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+	}
+
+	adminRole, err := h.partyRoleService.GetByName("Админ")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
 	party := party_mapper.CreateDTOToEntity(req)
-	err := h.partyService.Create(&party)
+	err = h.partyService.Create(&party)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	participant := &entity.Participant{
+		ID:      uuid.NewString(),
+		UserID:  user.ID,
+		RoleID:  adminRole.ID,
+		PartyID: party.ID,
+	}
+	err = h.participantService.Create(participant)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	w.WriteHeader(http.StatusCreated)
@@ -128,15 +151,25 @@ func (h *PartyHandler) getPartyAlbumDTOs(w http.ResponseWriter, party *entity.Pa
 	return albumDTOs
 }
 
-func (h *PartyHandler) getPartyParticipantDTOs(w http.ResponseWriter, party *entity.Party) []dto.UserShortInfoDTO {
-	participants, err := h.userService.GetByIDs(party.ParticipantsIDs)
+func (h *PartyHandler) getPartyParticipantDTOs(w http.ResponseWriter, party *entity.Party) []dto.ParticipantInfoDTO {
+	participants, err := h.participantService.GetByPartyID(party.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	participantDTOs := make([]dto.UserShortInfoDTO, 0)
+	participantDTOs := make([]dto.ParticipantInfoDTO, 0)
 	if len(participants) != 0 {
 		for _, participant := range participants {
-			participantDTO := user_mapper.EntityToShortInfoDTO(*participant)
+			user, err := h.userService.GetByID(participant.UserID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			userDTO := user_mapper.EntityToShortInfoDTO(*user)
+			role, err := h.partyRoleService.GetByID(participant.RoleID)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			roleDTO := party_role_mapper.EntityToPartyRoleDTO(*role)
+			participantDTO := participant_mapper.EntityToParticipantInfoDTO(*participant, userDTO, roleDTO)
 			participantDTOs = append(participantDTOs, participantDTO)
 		}
 	}
@@ -179,14 +212,10 @@ func (h *PartyHandler) AddAlbumToParty(w http.ResponseWriter, r *http.Request) {
 	}
 
 	albumCreateDTO := album_mapper.SpotifyDTOToEntity(spotifyAlbum)
-	insertedID, err := h.albumService.Create(&albumCreateDTO)
+	albumCreateDTO.PartyID = party.ID
+	_, err = h.albumService.Create(&albumCreateDTO)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	if err := h.partyService.AddAlbum(partyID, insertedID); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)

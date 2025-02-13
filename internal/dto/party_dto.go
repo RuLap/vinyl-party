@@ -8,19 +8,17 @@ type PartyCreateDTO struct {
 }
 
 type PartyShortInfoDTO struct {
-	ID          string           `json:"id"`
-	Host        UserShortInfoDTO `json:"host"`
-	Title       string           `json:"title"`
-	Description string           `json:"description"`
-	Date        string           `json:"date"`
+	ID          string `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Date        string `json:"date"`
 }
 
 type PartyInfoDTO struct {
-	ID           string             `json:"id"`
-	Host         UserShortInfoDTO   `json:"host"`
-	Title        string             `json:"title"`
-	Description  string             `json:"description"`
-	Date         string             `json:"date"`
-	Albums       []AlbumInfoDTO     `json:"albums"`
-	Participants []UserShortInfoDTO `json:"participants"`
+	ID           string               `json:"id"`
+	Title        string               `json:"title"`
+	Description  string               `json:"description"`
+	Date         string               `json:"date"`
+	Albums       []AlbumInfoDTO       `json:"albums"`
+	Participants []ParticipantInfoDTO `json:"participants"`
 }

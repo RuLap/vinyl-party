@@ -8,6 +8,7 @@ import (
 type PartyRoleService interface {
 	Create(role *entity.PartyRole) error
 	GetByID(id string) (*entity.PartyRole, error)
+	GetByName(name string) (*entity.PartyRole, error)
 }
 
 type partyRoleService struct {
@@ -24,4 +25,8 @@ func (s *partyRoleService) Create(role *entity.PartyRole) error {
 
 func (s *partyRoleService) GetByID(id string) (*entity.PartyRole, error) {
 	return s.partyRoleRepo.GetByID(id)
+}
+
+func (s *partyRoleService) GetByName(name string) (*entity.PartyRole, error) {
+	return s.partyRoleRepo.GetByName(name)
 }

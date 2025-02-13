@@ -8,6 +8,7 @@ import (
 	"vinyl-party/internal/repository"
 	"vinyl-party/internal/service"
 	"vinyl-party/internal/storage/mongodb"
+	"vinyl-party/pkg/cors"
 	"vinyl-party/pkg/recovery"
 
 	"github.com/go-chi/chi/v5"
@@ -26,6 +27,8 @@ func main() {
 	fmt.Println(storage)
 
 	router := chi.NewRouter()
+
+	router.Use(cors.Middleware)
 
 	spotifyService, err := service.NewSpotifyService(cfg.ProxyServer, cfg.SpotifyCredentials)
 	if err != nil {
