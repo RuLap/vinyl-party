@@ -69,7 +69,8 @@ func main() {
 	router.Post("/parties", partyHandler.CreateParty)
 	router.Get("/parties/{id}", partyHandler.GetPartyInfo)
 	router.Post("/parties/{id}/albums", partyHandler.AddAlbumToParty)
-	router.Post("/parties/{id}/participants", partyHandler.AddParticipantToParty)
+	router.Get("/parties/participants/active/{id}", partyHandler.GetActiveParticipationParties)
+	router.Get("/parties/participants/archive/{id}", partyHandler.GetArchiveParticipationParties)
 
 	server := &http.Server{
 		Addr:         cfg.HTTPServer.Address,

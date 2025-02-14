@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"time"
 	"vinyl-party/internal/entity"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,6 +14,9 @@ type PartyRepository interface {
 	Create(party *entity.Party) error
 	GetAll() ([]*entity.Party, error)
 	GetByID(id string) (*entity.Party, error)
+	GetByIDs(ids []string) ([]*entity.Party, error)
+	GetActiveByIDs(ids []string) ([]*entity.Party, error)
+	GetArchiveByIDs(ids []string) ([]*entity.Party, error)
 	AddAlbum(partyID string, albumID string) error
 	AddParticipant(partyID string, userID string) error
 }
@@ -54,6 +58,50 @@ func (r *partyRepository) GetByID(id string) (*entity.Party, error) {
 	}
 
 	return &party, nil
+}
+
+func (r *partyRepository) GetByIDs(id []string) ([]*entity.Party, error) {
+	var parties []*entity.Party
+	filter := bson.M{"_id": bson.M{"$in": id}}
+	cursor, err := r.collection.Find(context.Background(), filter)
+	if err != nil {
+		return nil, err
+	}
+
+	err = cursor.All(context.Background(), &parties)
+	return parties, err
+}
+
+func (r *partyRepository) GetActiveByIDs(id []string) ([]*entity.Party, error) {
+	var parties []*entity.Party
+	now := time.Now()
+	filter := bson.M{
+		"_id":  bson.M{"$in": id},
+		"date": bson.M{"$gt": now},
+	}
+	cursor, err := r.collection.Find(context.Background(), filter)
+	if err != nil {
+		return nil, err
+	}
+
+	err = cursor.All(context.Background(), &parties)
+	return parties, err
+}
+
+func (r *partyRepository) GetArchiveByIDs(id []string) ([]*entity.Party, error) {
+	var parties []*entity.Party
+	now := time.Now()
+	filter := bson.M{
+		"_id":  bson.M{"$in": id},
+		"date": bson.M{"$lt": now},
+	}
+	cursor, err := r.collection.Find(context.Background(), filter)
+	if err != nil {
+		return nil, err
+	}
+
+	err = cursor.All(context.Background(), &parties)
+	return parties, err
 }
 
 func (r *partyRepository) AddAlbum(partyID string, albumID string) error {

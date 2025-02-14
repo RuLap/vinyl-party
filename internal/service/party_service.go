@@ -11,6 +11,9 @@ type PartyService interface {
 	Create(party *entity.Party) error
 	GetAll() ([]*entity.Party, error)
 	GetByID(id string) (*entity.Party, error)
+	GetByIDs(id []string) ([]*entity.Party, error)
+	GetActiveByIDs(ids []string) ([]*entity.Party, error)
+	GetArchiveByIDs(ids []string) ([]*entity.Party, error)
 	AddAlbum(partyID string, albumID string) error
 	AddParticipant(partyID string, userID string) error
 }
@@ -25,7 +28,6 @@ func NewPartyService(partyRepo repository.PartyRepository) PartyService {
 
 func (s *partyService) Create(party *entity.Party) error {
 	party.ID = uuid.NewString()
-	party.ParticipantsIDs = []string{}
 	return s.partyRepo.Create(party)
 }
 
@@ -35,6 +37,18 @@ func (s *partyService) GetAll() ([]*entity.Party, error) {
 
 func (s *partyService) GetByID(id string) (*entity.Party, error) {
 	return s.partyRepo.GetByID(id)
+}
+
+func (s *partyService) GetByIDs(ids []string) ([]*entity.Party, error) {
+	return s.partyRepo.GetByIDs(ids)
+}
+
+func (s *partyService) GetActiveByIDs(ids []string) ([]*entity.Party, error) {
+	return s.partyRepo.GetActiveByIDs(ids)
+}
+
+func (s *partyService) GetArchiveByIDs(ids []string) ([]*entity.Party, error) {
+	return s.partyRepo.GetArchiveByIDs(ids)
 }
 
 func (s *partyService) AddAlbum(partyID string, albumID string) error {

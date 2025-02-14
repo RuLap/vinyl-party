@@ -12,6 +12,7 @@ type ParticipantRepository interface {
 	Create(participant *entity.Participant) error
 	GetByID(id string) (*entity.Participant, error)
 	GetByPartyID(partyID string) ([]*entity.Participant, error)
+	GetByUserID(userID string) ([]*entity.Participant, error)
 }
 
 type participantRepository struct {
@@ -46,6 +47,19 @@ func (r *participantRepository) GetByPartyID(partyID string) ([]*entity.Particip
 	if err = cursor.All(context.Background(), &participants); err != nil {
 		return nil, err
 	}
-	
+
 	return participants, nil
+}
+
+func (r *participantRepository) GetByUserID(userID string) ([]*entity.Participant, error) {
+	var participations []*entity.Participant
+	cursor, err := r.collection.Find(context.Background(), bson.M{"user_id": userID})
+	if err != nil {
+		return nil, err
+	}
+	if err = cursor.All(context.Background(), &participations); err != nil {
+		return nil, err
+	}
+
+	return participations, nil
 }

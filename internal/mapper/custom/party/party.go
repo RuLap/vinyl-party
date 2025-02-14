@@ -1,15 +1,17 @@
 package party
 
 import (
+	"time"
 	"vinyl-party/internal/dto"
 	"vinyl-party/internal/entity"
 )
 
 func CreateDTOToEntity(dto dto.PartyCreateDTO) entity.Party {
+	date, _ := time.Parse("", dto.Date)
 	return entity.Party{
 		Title:       dto.Title,
 		Description: dto.Description,
-		Date:        dto.Date,
+		Date:        date,
 	}
 }
 
@@ -18,7 +20,7 @@ func EntityToShortInfoDTO(party entity.Party) dto.PartyShortInfoDTO {
 		ID:          party.ID,
 		Title:       party.Title,
 		Description: party.Description,
-		Date:        party.Date,
+		Date:        party.Date.String(),
 	}
 }
 
@@ -27,7 +29,7 @@ func EntityToInfoDTO(party entity.Party, albumDTOs []dto.AlbumInfoDTO, participa
 		ID:           party.ID,
 		Title:        party.Title,
 		Description:  party.Description,
-		Date:         party.Date,
+		Date:         party.Date.String(),
 		Albums:       albumDTOs,
 		Participants: participantDTOs,
 	}

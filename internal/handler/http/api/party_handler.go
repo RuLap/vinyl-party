@@ -2,9 +2,10 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/google/uuid"
 	"net/http"
 	"vinyl-party/internal/entity"
+
+	"github.com/google/uuid"
 
 	"vinyl-party/internal/dto"
 	album_mapper "vinyl-party/internal/mapper/custom/album"
@@ -94,6 +95,72 @@ func (h *PartyHandler) GetAllParties(w http.ResponseWriter, e *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(parties)
+}
+
+func (h *PartyHandler) GetActiveParticipationParties(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "id")
+	if userID == "" {
+		http.Error(w, "Отсутствует идентификатор пользователя", http.StatusBadRequest)
+		return
+	}
+
+	participations, err := h.participantService.GetByUserID(userID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var partyIDs []string
+	for _, participation := range participations {
+		partyIDs = append(partyIDs, participation.PartyID)
+	}
+
+	parties, err := h.partyService.GetActiveByIDs(partyIDs)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var partyDTOs []dto.PartyShortInfoDTO
+	for _, party := range parties {
+		dto := party_mapper.EntityToShortInfoDTO(*party)
+		partyDTOs = append(partyDTOs, dto)
+	}
+
+	json.NewEncoder(w).Encode(partyDTOs)
+}
+
+func (h *PartyHandler) GetArchiveParticipationParties(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "id")
+	if userID == "" {
+		http.Error(w, "Отсутствует идентификатор пользователя", http.StatusBadRequest)
+		return
+	}
+
+	participations, err := h.participantService.GetByUserID(userID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var partyIDs []string
+	for _, participation := range participations {
+		partyIDs = append(partyIDs, participation.PartyID)
+	}
+
+	parties, err := h.partyService.GetArchiveByIDs(partyIDs)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var partyDTOs []dto.PartyShortInfoDTO
+	for _, party := range parties {
+		dto := party_mapper.EntityToShortInfoDTO(*party)
+		partyDTOs = append(partyDTOs, dto)
+	}
+
+	json.NewEncoder(w).Encode(partyDTOs)
 }
 
 func (h *PartyHandler) GetPartyInfo(w http.ResponseWriter, r *http.Request) {
@@ -216,29 +283,6 @@ func (h *PartyHandler) AddAlbumToParty(w http.ResponseWriter, r *http.Request) {
 	_, err = h.albumService.Create(&albumCreateDTO)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-}
-
-func (h *PartyHandler) AddParticipantToParty(w http.ResponseWriter, r *http.Request) {
-	partyID := chi.URLParam(r, "id")
-	if partyID == "" {
-		http.Error(w, "Отсутствует идентификатор вечеринки", http.StatusBadRequest)
-		return
-	}
-
-	var input struct {
-		UserID string `json:"user_id"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "Неверный формат данных", http.StatusBadRequest)
-		return
-	}
-
-	if err := h.partyService.AddParticipant(partyID, input.UserID); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
