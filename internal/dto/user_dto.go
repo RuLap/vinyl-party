@@ -27,3 +27,8 @@ type UserInfoDTO struct {
 	Email     string `json:"email"`
 	AvatarUrl string `json:"avatar_url"`
 }
+
+type UserLoginResponseDTO struct {
+	User  UserInfoDTO `json:"user"`
+	Token string      `json:"token,omitempty"`
+}

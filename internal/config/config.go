@@ -15,6 +15,7 @@ type Config struct {
 	HTTPServer         `yaml:"http_server"`
 	ProxyServer        `yaml:"proxy_server"`
 	SpotifyCredentials `yaml:"spotify_credentials"`
+	JWT                `yaml:"jwt"`
 }
 
 type HTTPServer struct {
@@ -33,6 +34,10 @@ type ProxyServer struct {
 type SpotifyCredentials struct {
 	ClientID     string `yaml:"client_id" env-required:"true"`
 	ClientSecret string `yaml:"client_secret" env-required:"true"`
+}
+
+type JWT struct {
+	Secret string `yaml:"secret" env-required:"true"`
 }
 
 func MustLoad() *Config {

@@ -37,24 +37,6 @@ func (h *AlbumHandler) CreateAlbum(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(album)
 }
 
-func (h *AlbumHandler) GetAlbumByID(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	if id == "" {
-		http.Error(w, "Missing album id", http.StatusBadRequest)
-		return
-	}
-
-	album, err := h.albumService.GetByID(id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
-
-	albumDTO := album_mapper.EntityToShortInfoDTO(*album)
-
-	json.NewEncoder(w).Encode(albumDTO)
-}
-
 func (h *AlbumHandler) DeleteAlbum(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {

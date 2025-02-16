@@ -1,8 +1,10 @@
 package entity
 
+import "time"
+
 type Rating struct {
-	ID      string `bson:"_id"`
-	UserID  string `bson:"user_id"`
-	AlbumID string `bson:"album_id"`
-	Score   int    `bson:"score"`
+	ID        string    `bson:"_id"`
+	UserID    string    `bson:"user_id"`
+	Score     int       `bson:"score"`
+	CreatedAt time.Time `bson:"created_at"`
 }

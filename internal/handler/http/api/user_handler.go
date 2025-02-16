@@ -3,9 +3,11 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 	"vinyl-party/internal/dto"
 	user_mapper "vinyl-party/internal/mapper/custom/user"
 	"vinyl-party/internal/service"
+	"vinyl-party/pkg/jwt_helper"
 )
 
 type UserHandler struct {
@@ -24,6 +26,7 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := user_mapper.RegisterDTOToEntity(req)
+	user.CreatedAt = time.Now()
 
 	if err := h.userService.Register(&user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -45,7 +48,24 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	token, err := jwt_helper.GenerateJWT(user.ID, user.Email)
+	if err != nil {
+		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session",
+		Value:    token,
+		HttpOnly: true,
+		Secure:   false,
+		Path:     "/",
+		MaxAge:   3600 * 24 * 7,
+	})
+
+	loginResponseDTO := user_mapper.EntityToLoginRepsponseDTO(*user, token)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(loginResponseDTO)
 }

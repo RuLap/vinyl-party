@@ -12,7 +12,6 @@ import (
 type AlbumRepository interface {
 	Create(album *entity.Album) error
 	GetByID(id string) (*entity.Album, error)
-	GetByPartyID(partyID string) ([]*entity.Album, error)
 	AddRating(albumID string, ratingID string) error
 	Delete(id string) error
 }
@@ -40,17 +39,6 @@ func (r *albumRepository) GetByID(id string) (*entity.Album, error) {
 	}
 
 	return &album, nil
-}
-
-func (r *albumRepository) GetByPartyID(partyID string) ([]*entity.Album, error) {
-	var albums []*entity.Album
-	cursor, err := r.collection.Find(context.Background(), bson.M{"party_id": partyID})
-	if err != nil {
-		return nil, err
-	}
-
-	err = cursor.All(context.Background(), &albums)
-	return albums, err
 }
 
 func (r *albumRepository) AddRating(albumID string, ratingID string) error {

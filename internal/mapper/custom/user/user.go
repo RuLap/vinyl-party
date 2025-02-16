@@ -40,3 +40,10 @@ func EntityToInfoDTO(user entity.User) dto.UserInfoDTO {
 		AvatarUrl: user.AvatarUrl,
 	}
 }
+
+func EntityToLoginRepsponseDTO(user entity.User, token string) dto.UserLoginResponseDTO {
+	return dto.UserLoginResponseDTO{
+		User:  EntityToInfoDTO(user),
+		Token: token,
+	}
+}

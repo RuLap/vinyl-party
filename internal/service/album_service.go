@@ -10,7 +10,6 @@ import (
 type AlbumService interface {
 	Create(album *entity.Album) (string, error)
 	GetByID(id string) (*entity.Album, error)
-	GetByPartyID(partyID string) ([]*entity.Album, error)
 	AddRating(albumID string, ratingID string) error
 	Delete(id string) error
 }
@@ -35,10 +34,6 @@ func (s *albumService) Create(album *entity.Album) (string, error) {
 
 func (s *albumService) GetByID(id string) (*entity.Album, error) {
 	return s.albumRepo.GetByID(id)
-}
-
-func (s *albumService) GetByPartyID(partyID string) ([]*entity.Album, error) {
-	return s.albumRepo.GetByPartyID(partyID)
 }
 
 func (s *albumService) AddRating(albumID string, ratingID string) error {

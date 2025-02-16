@@ -6,7 +6,6 @@ type RatingCreateDTO struct {
 }
 
 type RatingInfoDTO struct {
-	ID    string           `json:"id"`
 	User  UserShortInfoDTO `json:"user"`
 	Score int              `json:"score"`
 }
