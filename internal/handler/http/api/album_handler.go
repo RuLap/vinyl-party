@@ -28,7 +28,7 @@ func (h *AlbumHandler) CreateAlbum(w http.ResponseWriter, r *http.Request) {
 
 	album := album_mapper.CreateDTOToEntity(req)
 
-	if _, err := h.albumService.Create(&album); err != nil {
+	if _, err := h.albumService.Create(r.Context(), &album); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -44,7 +44,7 @@ func (h *AlbumHandler) DeleteAlbum(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.albumService.Delete(id); err != nil {
+	if err := h.albumService.Delete(r.Context(), id); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -71,7 +71,7 @@ func (h *AlbumHandler) AddRating(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.albumService.AddRating(id, payload.RatingID); err != nil {
+	if err := h.albumService.AddRating(r.Context(), id, payload.RatingID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

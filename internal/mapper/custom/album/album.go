@@ -14,7 +14,7 @@ func CreateDTOToEntity(dto dto.AlbumCreateDTO) entity.Album {
 	}
 }
 
-func EntityToInfoDTO(album *entity.Album, ratingDTOs []dto.RatingInfoDTO, averageRating int) dto.AlbumInfoDTO {
+func EntityToInfoDTO(album *entity.Album, ratingDTOs []dto.RatingInfoDTO) dto.AlbumInfoDTO {
 	return dto.AlbumInfoDTO{
 		ID:            album.ID,
 		Title:         album.Title,
@@ -22,7 +22,7 @@ func EntityToInfoDTO(album *entity.Album, ratingDTOs []dto.RatingInfoDTO, averag
 		CoverUrl:      album.CoverUrl,
 		SpotifyUrl:    album.SpotifyUrl,
 		Ratings:       ratingDTOs,
-		AverageRating: averageRating,
+		AverageRating: album.AverageRating,
 	}
 }
 

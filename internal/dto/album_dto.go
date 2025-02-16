@@ -14,7 +14,7 @@ type AlbumInfoDTO struct {
 	CoverUrl      string          `json:"cover_url"`
 	SpotifyUrl    string          `json:"spotify_url"`
 	Ratings       []RatingInfoDTO `json:"ratings"`
-	AverageRating int             `json:"average_rating,omitempty"`
+	AverageRating *int            `json:"average_rating,omitempty"`
 }
 
 type AlbumAddFromSpotifyDTO struct {

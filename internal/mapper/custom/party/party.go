@@ -24,13 +24,13 @@ func EntityToShortInfoDTO(party entity.Party) dto.PartyShortInfoDTO {
 	}
 }
 
-func EntityToInfoDTO(party entity.Party, albumDTOs []dto.AlbumInfoDTO, participantDTOs []dto.ParticipantInfoDTO) dto.PartyInfoDTO {
+func EntityToInfoDTO(party entity.Party, albums []dto.AlbumInfoDTO, participants []dto.ParticipantInfoDTO) dto.PartyInfoDTO {
 	return dto.PartyInfoDTO{
 		ID:           party.ID,
 		Title:        party.Title,
 		Description:  party.Description,
 		Date:         party.Date.String(),
-		Albums:       albumDTOs,
-		Participants: participantDTOs,
+		Albums:       albums,
+		Participants: participants,
 	}
 }

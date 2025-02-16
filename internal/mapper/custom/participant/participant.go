@@ -5,8 +5,9 @@ import (
 	"vinyl-party/internal/entity"
 )
 
-func CreateDTOToEntity(dto dto.CreateParticipantDTO) entity.Participant {
-	return entity.Participant{
-		UserID: dto.UserID,
+func EntityToParticipantInfoDTO(participant entity.Participant, user dto.UserShortInfoDTO) dto.ParticipantInfoDTO {
+	return dto.ParticipantInfoDTO{
+		User: user,
+		Role: string(participant.Role),
 	}
 }

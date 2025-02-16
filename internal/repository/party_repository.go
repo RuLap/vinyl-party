@@ -13,9 +13,10 @@ import (
 
 type PartyRepository interface {
 	EnsureIndexes() error
-	Create(party *entity.Party) error
-	GetPartiesByUserID(userID string, status entity.PartyStatus) ([]*entity.Party, error)
-	GetByID(id string) (*entity.Party, error)
+	Create(ctx context.Context, party *entity.Party) error
+	GetPartiesByUserID(ctx context.Context, userID string, status entity.PartyStatus) ([]*entity.Party, error)
+	GetByID(ctx context.Context, id string) (*entity.Party, error)
+	AddAlbumToParty(ctx context.Context, partyID, albumID string) error
 }
 
 type partyRepository struct {
@@ -54,12 +55,12 @@ func (r *partyRepository) EnsureIndexes() error {
 	return err
 }
 
-func (r *partyRepository) Create(party *entity.Party) error {
-	_, err := r.collection.InsertOne(context.Background(), party)
+func (r *partyRepository) Create(ctx context.Context, party *entity.Party) error {
+	_, err := r.collection.InsertOne(ctx, party)
 	return err
 }
 
-func (r *partyRepository) GetPartiesByUserID(userID string, status entity.PartyStatus) ([]*entity.Party, error) {
+func (r *partyRepository) GetPartiesByUserID(ctx context.Context, userID string, status entity.PartyStatus) ([]*entity.Party, error) {
 	filter := bson.M{
 		"participants.user_id": userID,
 	}
@@ -80,19 +81,27 @@ func (r *partyRepository) GetPartiesByUserID(userID string, status entity.PartyS
 	}
 
 	var parties []*entity.Party
-	if err = cursor.All(context.Background(), &parties); err != nil {
+	if err = cursor.All(ctx, &parties); err != nil {
 		return nil, fmt.Errorf("failed to decode parties: %v", err)
 	}
 
 	return parties, nil
 }
 
-func (r *partyRepository) GetByID(id string) (*entity.Party, error) {
+func (r *partyRepository) GetByID(ctx context.Context, id string) (*entity.Party, error) {
 	var party entity.Party
-	err := r.collection.FindOne(context.Background(), bson.M{"_id": id}).Decode(&party)
+	err := r.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&party)
 	if err != nil {
 		return nil, err
 	}
 
 	return &party, nil
+}
+
+func (r *partyRepository) AddAlbumToParty(ctx context.Context, partyID, albumID string) error {
+	filter := bson.M{"_id": partyID}
+	update := bson.M{"$addToSet": bson.M{"album_ids": albumID}}
+
+	_, err := r.collection.UpdateOne(ctx, filter, update)
+	return err
 }

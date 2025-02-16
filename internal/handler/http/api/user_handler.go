@@ -28,7 +28,7 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	user := user_mapper.RegisterDTOToEntity(req)
 	user.CreatedAt = time.Now()
 
-	if err := h.userService.Register(&user); err != nil {
+	if err := h.userService.Register(r.Context(), &user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -42,7 +42,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	user, err := h.userService.Login(req.Email, req.Password)
+	user, err := h.userService.Login(r.Context(), req.Email, req.Password)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
