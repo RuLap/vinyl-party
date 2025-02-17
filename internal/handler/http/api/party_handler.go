@@ -118,3 +118,22 @@ func (h *PartyHandler) AddAlbum(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(createdAlbumDTO)
 }
+
+func (h *PartyHandler) AddParticipant(w http.ResponseWriter, r *http.Request) {
+	partyID := chi.URLParam(r, "id")
+
+	var req *dto.ParticipantCreateDTO
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Неверный формат данных", http.StatusBadRequest)
+		return
+	}
+
+	createdParticipantDTO, err := h.partyService.AddParticipant(r.Context(), partyID, req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(createdParticipantDTO)
+}

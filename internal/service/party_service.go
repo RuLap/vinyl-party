@@ -22,6 +22,7 @@ type PartyService interface {
 	GetByID(ctx context.Context, id string) (*dto.PartyInfoDTO, error)
 	GetUserParties(ctx context.Context, userID string, status entity.PartyStatus) ([]*dto.PartyShortInfoDTO, error)
 	AddAlbum(ctx context.Context, partyID string, album *entity.SpotifyAlbum) (*dto.AlbumInfoDTO, error)
+	AddParticipant(ctx context.Context, partyID string, participantDTO *dto.ParticipantCreateDTO) (*dto.ParticipantInfoDTO, error)
 }
 
 type partyService struct {
@@ -169,9 +170,6 @@ func (s *partyService) AddAlbum(ctx context.Context, partyID string, spotifyAlbu
 	album.ID = uuid.NewString()
 	album.RatingIDs = make([]string, 0)
 	album.CreatedAt = time.Now().UTC()
-	if err != nil {
-		return nil, err
-	}
 
 	err = mongo.WithSession(ctx, session, func(sc mongo.SessionContext) error {
 		if err := s.albumRepo.Create(sc, &album); err != nil {
@@ -191,6 +189,39 @@ func (s *partyService) AddAlbum(ctx context.Context, partyID string, spotifyAlbu
 
 	ratingDTOs := make([]dto.RatingInfoDTO, 0)
 	result := album_mapper.EntityToInfoDTO(&album, ratingDTOs)
+
+	return &result, nil
+}
+
+func (s *partyService) AddParticipant(ctx context.Context, partyID string, participantDTO *dto.ParticipantCreateDTO) (*dto.ParticipantInfoDTO, error) {
+	session, err := s.client.StartSession()
+	if err != nil {
+		return nil, err
+	}
+	defer session.EndSession(ctx)
+
+	participant := entity.Participant{
+		UserID: participantDTO.UserID,
+		Role:   entity.PartyRoleGuest,
+	}
+	participant.CreatedAt = time.Now().UTC()
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.partyRepo.AddParticipant(ctx, partyID, &participant)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.userRepo.GetByID(ctx, participant.UserID)
+	if err != nil {
+		return nil, err
+	}
+	userDTO := user_mapper.EntityToShortInfoDTO(user)
+
+	result := participant_mapper.EntityToParticipantInfoDTO(participant, userDTO)
 
 	return &result, nil
 }

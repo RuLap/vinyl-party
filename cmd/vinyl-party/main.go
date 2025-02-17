@@ -73,7 +73,7 @@ func main() {
 		router.Get("/users/{id}/parties", partyHandler.GetUserParties)
 		router.Get("/parties/{id}", partyHandler.GetParty)
 		router.Post("/parties/{id}/albums", partyHandler.AddAlbum)
-		//router.Post("/parties/{id}/participants", partyHandler)
+		router.Post("/parties/{id}/participants", partyHandler.AddParticipant)
 
 		router.Post("/albums/{id}/ratings", albumHandler.AddRating)
 	})

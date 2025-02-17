@@ -3,9 +3,10 @@ package repository
 import (
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 	"vinyl-party/internal/entity"
+
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,6 +18,7 @@ type PartyRepository interface {
 	GetPartiesByUserID(ctx context.Context, userID string, status entity.PartyStatus) ([]*entity.Party, error)
 	GetByID(ctx context.Context, id string) (*entity.Party, error)
 	AddAlbumToParty(ctx context.Context, partyID, albumID string) error
+	AddParticipant(ctx context.Context, partyID string, participant *entity.Participant) error
 }
 
 type partyRepository struct {
@@ -101,6 +103,14 @@ func (r *partyRepository) GetByID(ctx context.Context, id string) (*entity.Party
 func (r *partyRepository) AddAlbumToParty(ctx context.Context, partyID, albumID string) error {
 	filter := bson.M{"_id": partyID}
 	update := bson.M{"$addToSet": bson.M{"album_ids": albumID}}
+
+	_, err := r.collection.UpdateOne(ctx, filter, update)
+	return err
+}
+
+func (r *partyRepository) AddParticipant(ctx context.Context, partyID string, participant *entity.Participant) error {
+	filter := bson.M{"_id": partyID}
+	update := bson.M{"$addToSet": bson.M{"participants": participant}}
 
 	_, err := r.collection.UpdateOne(ctx, filter, update)
 	return err
