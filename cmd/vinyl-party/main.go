@@ -52,11 +52,10 @@ func main() {
 	userService := service.NewUserService(userRepo)
 	albumService := service.NewAlbumService(albumRepo, ratingRepo, userRepo, storage.Database().Client())
 	partyService := service.NewPartyService(partyRepo, albumRepo, ratingRepo, userRepo, storage.Database().Client())
-	ratingService := service.NewRatingService(ratingRepo)
 
 	userHandler := api.NewUserHandler(userService)
 	albumHandler := api.NewAlbumHandler(albumService)
-	partyHandler := api.NewPartyHandler(userService, albumService, partyService, ratingService, spotifyService)
+	partyHandler := api.NewPartyHandler(userService, albumService, partyService, spotifyService)
 
 	router.Group(func(r chi.Router) {
 		r.Post("/login", userHandler.Login)
@@ -74,7 +73,6 @@ func main() {
 		router.Get("/parties/{id}", partyHandler.GetParty)
 		router.Post("/parties/{id}/albums", partyHandler.AddAlbum)
 		router.Post("/parties/{id}/participants", partyHandler.AddParticipant)
-
 		router.Post("/albums/{id}/ratings", albumHandler.AddRating)
 	})
 

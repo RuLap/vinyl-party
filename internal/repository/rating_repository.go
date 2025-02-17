@@ -10,7 +10,6 @@ import (
 
 type RatingRepository interface {
 	Create(ctx context.Context, rating *entity.Rating) error
-	GetByID(ctx context.Context, id string) (*entity.Rating, error)
 	GetByIDs(ctx context.Context, ids []string) ([]*entity.Rating, error)
 	GetByAlbumID(ctx context.Context, albumID string) ([]*entity.Rating, error)
 }
@@ -28,16 +27,6 @@ func NewRatingRepository(db *mongo.Database) RatingRepository {
 func (r *ratingRepository) Create(ctx context.Context, rating *entity.Rating) error {
 	_, err := r.collection.InsertOne(ctx, rating)
 	return err
-}
-
-func (r *ratingRepository) GetByID(ctx context.Context, id string) (*entity.Rating, error) {
-	var rating entity.Rating
-	err := r.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&rating)
-	if err != nil {
-		return nil, err
-	}
-
-	return &rating, nil
 }
 
 func (r *ratingRepository) GetByIDs(ctx context.Context, ids []string) ([]*entity.Rating, error) {

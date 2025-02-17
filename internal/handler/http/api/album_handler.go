@@ -31,12 +31,13 @@ func (h *AlbumHandler) AddRating(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rating, err := h.albumService.AddRating(r.Context(), id, req)
+	album, err := h.albumService.AddRating(r.Context(), id, req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
-	json.NewEncoder(w).Encode(rating)
+	w.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(w).Encode(album)
 }

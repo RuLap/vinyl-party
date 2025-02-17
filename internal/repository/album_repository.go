@@ -16,6 +16,7 @@ type AlbumRepository interface {
 	GetByID(ctx context.Context, id string) (*entity.Album, error)
 	GetByIDs(ctx context.Context, ids []string) ([]*entity.Album, error)
 	AddRating(ctx context.Context, albumID string, ratingID string) error
+	UpdateAvgRating(ctx context.Context, albumID string, avgRating *int) error
 	Delete(ctx context.Context, id string) error
 }
 
@@ -94,6 +95,16 @@ func (r *albumRepository) AddRating(ctx context.Context, albumID string, ratingI
 	}
 	if result.MatchedCount == 0 {
 		return errors.New("album not found")
+	}
+
+	return nil
+}
+
+func (r *albumRepository) UpdateAvgRating(ctx context.Context, albumID string, avgRating *int) error {
+	update := bson.M{"$set": bson.M{"average_rating": avgRating}}
+	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": albumID}, update)
+	if err != nil {
+		return err
 	}
 
 	return nil

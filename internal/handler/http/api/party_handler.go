@@ -15,7 +15,6 @@ type PartyHandler struct {
 	userService    service.UserService
 	albumService   service.AlbumService
 	partyService   service.PartyService
-	ratingService  service.RatingService
 	spotifyService service.SpotifyService
 }
 
@@ -23,13 +22,11 @@ func NewPartyHandler(
 	userService service.UserService,
 	albumService service.AlbumService,
 	partyService service.PartyService,
-	ratingService service.RatingService,
 	spotifyService service.SpotifyService) *PartyHandler {
 	return &PartyHandler{
 		userService:    userService,
 		albumService:   albumService,
 		partyService:   partyService,
-		ratingService:  ratingService,
 		spotifyService: spotifyService,
 	}
 }
