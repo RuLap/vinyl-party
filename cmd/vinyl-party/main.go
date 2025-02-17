@@ -50,8 +50,8 @@ func main() {
 	}
 
 	userService := service.NewUserService(userRepo)
-	albumService := service.NewAlbumService(albumRepo)
-	partyService := service.NewPartyService(partyRepo, albumRepo, storage.Database().Client())
+	albumService := service.NewAlbumService(albumRepo, ratingRepo, userRepo, storage.Database().Client())
+	partyService := service.NewPartyService(partyRepo, albumRepo, ratingRepo, userRepo, storage.Database().Client())
 	ratingService := service.NewRatingService(ratingRepo)
 
 	userHandler := api.NewUserHandler(userService)
@@ -72,11 +72,9 @@ func main() {
 		router.Post("/parties", partyHandler.CreateParty)
 		router.Get("/users/{id}/parties", partyHandler.GetUserParties)
 		router.Get("/parties/{id}", partyHandler.GetParty)
-		//router.Post("/parties/{id}/albums", partyHandler)
+		router.Post("/parties/{id}/albums", partyHandler.AddAlbum)
 		//router.Post("/parties/{id}/participants", partyHandler)
 
-		router.Post("/albums", albumHandler.CreateAlbum)
-		router.Delete("/albums/{id}", albumHandler.DeleteAlbum)
 		router.Post("/albums/{id}/ratings", albumHandler.AddRating)
 	})
 

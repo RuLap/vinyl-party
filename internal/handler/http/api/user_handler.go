@@ -19,7 +19,7 @@ func NewUserHandler(userService service.UserService) *UserHandler {
 }
 
 func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
-	var req dto.UserRegisterDTO
+	var req *dto.UserRegisterDTO
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -63,7 +63,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   3600 * 24 * 7,
 	})
 
-	loginResponseDTO := user_mapper.EntityToLoginRepsponseDTO(*user, token)
+	loginResponseDTO := user_mapper.EntityToLoginRepsponseDTO(user, token)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

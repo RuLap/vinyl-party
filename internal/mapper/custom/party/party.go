@@ -6,7 +6,7 @@ import (
 	"vinyl-party/internal/entity"
 )
 
-func CreateDTOToEntity(dto dto.PartyCreateDTO) entity.Party {
+func CreateDTOToEntity(dto *dto.PartyCreateDTO) entity.Party {
 	date, _ := time.Parse("", dto.Date)
 	return entity.Party{
 		Title:       dto.Title,
@@ -15,7 +15,7 @@ func CreateDTOToEntity(dto dto.PartyCreateDTO) entity.Party {
 	}
 }
 
-func EntityToShortInfoDTO(party entity.Party) dto.PartyShortInfoDTO {
+func EntityToShortInfoDTO(party *entity.Party) dto.PartyShortInfoDTO {
 	return dto.PartyShortInfoDTO{
 		ID:          party.ID,
 		Title:       party.Title,
@@ -24,7 +24,7 @@ func EntityToShortInfoDTO(party entity.Party) dto.PartyShortInfoDTO {
 	}
 }
 
-func EntityToInfoDTO(party entity.Party, albums []dto.AlbumInfoDTO, participants []dto.ParticipantInfoDTO) dto.PartyInfoDTO {
+func EntityToInfoDTO(party *entity.Party, albums []dto.AlbumInfoDTO, participants []dto.ParticipantInfoDTO) dto.PartyInfoDTO {
 	return dto.PartyInfoDTO{
 		ID:           party.ID,
 		Title:        party.Title,
