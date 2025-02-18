@@ -3,8 +3,9 @@ package repository
 import (
 	"context"
 	"errors"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"vinyl-party/internal/entity"
+
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -93,7 +94,7 @@ func (r *albumRepository) AddRating(ctx context.Context, albumID string, ratingI
 	if err != nil {
 		return err
 	}
-	if result.MatchedCount == 0 {
+	if result.ModifiedCount == 0 {
 		return errors.New("album not found")
 	}
 
@@ -102,9 +103,12 @@ func (r *albumRepository) AddRating(ctx context.Context, albumID string, ratingI
 
 func (r *albumRepository) UpdateAvgRating(ctx context.Context, albumID string, avgRating *int) error {
 	update := bson.M{"$set": bson.M{"average_rating": avgRating}}
-	_, err := r.collection.UpdateOne(ctx, bson.M{"_id": albumID}, update)
+	result, err := r.collection.UpdateOne(ctx, bson.M{"_id": albumID}, update)
 	if err != nil {
 		return err
+	}
+	if result.ModifiedCount == 0 {
+		return errors.New("album not found")
 	}
 
 	return nil

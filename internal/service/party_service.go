@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log/slog"
 	"time"
 	"vinyl-party/internal/dto"
 	"vinyl-party/internal/entity"
@@ -66,16 +67,19 @@ func (s *partyService) Create(ctx context.Context, partyDTO *dto.PartyCreateDTO)
 func (s *partyService) GetByID(ctx context.Context, id string) (*dto.PartyInfoDTO, error) {
 	party, err := s.partyRepo.GetByID(ctx, id)
 	if err != nil {
+		slog.Error("failed to get party", "partyID", id, "error", err)
 		return nil, err
 	}
 
 	albumDTOs, err := s.getAlbumsByIDs(ctx, party.AlbumIDs)
 	if err != nil {
+		slog.Error("failed to get party albums", "partyID", id, "error", err)
 		return nil, err
 	}
 
 	participantDTOs, err := s.getParticipantDTOs(ctx, party.Participants)
 	if err != nil {
+		slog.Error("failed to get party participants", "partyID", id, "error", err)
 		return nil, err
 	}
 
@@ -147,6 +151,7 @@ func (s *partyService) GetUserParties(ctx context.Context, userID string, status
 
 	parties, err := s.partyRepo.GetPartiesByUserID(ctx, userID, status)
 	if err != nil {
+		slog.Error("failed to get user parties", "userID", userID, "error", err)
 		return nil, err
 	}
 
@@ -162,6 +167,7 @@ func (s *partyService) GetUserParties(ctx context.Context, userID string, status
 func (s *partyService) AddAlbum(ctx context.Context, partyID string, spotifyAlbum *entity.SpotifyAlbum) (*dto.AlbumInfoDTO, error) {
 	session, err := s.client.StartSession()
 	if err != nil {
+		slog.Error("failed to start the session", "partyID", partyID, "error", err)
 		return nil, err
 	}
 	defer session.EndSession(ctx)
@@ -173,10 +179,12 @@ func (s *partyService) AddAlbum(ctx context.Context, partyID string, spotifyAlbu
 
 	err = mongo.WithSession(ctx, session, func(sc mongo.SessionContext) error {
 		if err := s.albumRepo.Create(sc, &album); err != nil {
+			slog.Error("failed to create album", "partyID", partyID, "error", err)
 			return err
 		}
 
 		if err := s.partyRepo.AddAlbumToParty(sc, partyID, album.ID); err != nil {
+			slog.Error("failed to add album to party", "partyID", partyID, "error", err)
 			return err
 		}
 
@@ -196,6 +204,7 @@ func (s *partyService) AddAlbum(ctx context.Context, partyID string, spotifyAlbu
 func (s *partyService) AddParticipant(ctx context.Context, partyID string, participantDTO *dto.ParticipantCreateDTO) (*dto.ParticipantInfoDTO, error) {
 	session, err := s.client.StartSession()
 	if err != nil {
+		slog.Error("failed to start a session", "partyID", partyID, "error", err)
 		return nil, err
 	}
 	defer session.EndSession(ctx)
@@ -206,17 +215,15 @@ func (s *partyService) AddParticipant(ctx context.Context, partyID string, parti
 	}
 	participant.CreatedAt = time.Now().UTC()
 
-	if err != nil {
-		return nil, err
-	}
-
 	err = s.partyRepo.AddParticipant(ctx, partyID, &participant)
 	if err != nil {
+		slog.Error("failed to add a aprticipant to party", "partyID", partyID, "error", err)
 		return nil, err
 	}
 
 	user, err := s.userRepo.GetByID(ctx, participant.UserID)
 	if err != nil {
+		slog.Error("failed to get user", "userID", participant.UserID, "error", err)
 		return nil, err
 	}
 	userDTO := user_mapper.EntityToShortInfoDTO(user)

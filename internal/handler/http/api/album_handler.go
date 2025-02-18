@@ -21,7 +21,7 @@ func NewAlbumHandler(albumService service.AlbumService) *AlbumHandler {
 func (h *AlbumHandler) AddRating(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		http.Error(w, "Missing album id", http.StatusBadRequest)
+		http.Error(w, "Неверный идентификатор альбома", http.StatusBadRequest)
 		return
 	}
 

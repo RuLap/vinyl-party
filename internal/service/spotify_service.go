@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strings"
@@ -29,7 +29,8 @@ type spotifyService struct {
 func NewSpotifyService(proxyServer config.ProxyServer, spotifyCred config.SpotifyCredentials) (SpotifyService, error) {
 	client, err := getProxyClient(proxyServer)
 	if err != nil {
-		return nil, fmt.Errorf("ошибка при настройке прокси: %w", err)
+		slog.Error("failed to init proxy client", "error", err)
+		return nil, err
 	}
 
 	service := &spotifyService{
@@ -39,6 +40,7 @@ func NewSpotifyService(proxyServer config.ProxyServer, spotifyCred config.Spotif
 	}
 
 	if err := service.getAuthToken(); err != nil {
+		slog.Error("failed to get an auth token", "error", err)
 		return nil, err
 	}
 
@@ -48,11 +50,13 @@ func NewSpotifyService(proxyServer config.ProxyServer, spotifyCred config.Spotif
 func (s *spotifyService) GetAlbumFromLink(link string) (*entity.SpotifyAlbum, error) {
 	albumID, err := s.parseAlbumIDFromLink(link)
 	if err != nil {
+		slog.Error("failed to parse id from spotify link", "link", link, "error", err)
 		return nil, err
 	}
 
 	album, err := s.getAlbumByID(albumID)
 	if err != nil {
+		slog.Error("failed to get album", "albumID", album, "error", err)
 		return nil, err
 	}
 	album.Url = link
@@ -78,7 +82,8 @@ func (s *spotifyService) GetAlbumFromLink(link string) (*entity.SpotifyAlbum, er
 func getProxyClient(proxyServer config.ProxyServer) (*http.Client, error) {
 	proxy, err := url.Parse(proxyServer.Address)
 	if err != nil {
-		return nil, fmt.Errorf("неверный proxy URL: %w", err)
+		slog.Error("failed to parse proxy url", "error", err)
+		return nil, err
 	}
 
 	proxy.User = url.UserPassword(proxyServer.Username, proxyServer.Password)
@@ -103,6 +108,7 @@ func (s *spotifyService) getAuthToken() error {
 
 	req, err := http.NewRequest("POST", "https://accounts.spotify.com/api/token", strings.NewReader(data.Encode()))
 	if err != nil {
+		slog.Error("failed to create SotifyAPI token request", "error", err)
 		return err
 	}
 
@@ -111,16 +117,19 @@ func (s *spotifyService) getAuthToken() error {
 
 	resp, err := s.client.Do(req)
 	if err != nil {
+		slog.Error("failed to do SotifyAPI token request", "error", err)
 		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, _ := io.ReadAll(resp.Body)
+		slog.Error("failed to recieve SotifyAPI token request", "error", errors.New("failed to recieve token: "+string(body)))
 		return errors.New("failed to recieve token: " + string(body))
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&s.token); err != nil {
+		slog.Error("failed to decode Spotify API token", "error", err)
 		return err
 	}
 
@@ -163,7 +172,7 @@ func (s *spotifyService) getAlbumByID(id string) (*entity.SpotifyAlbum, error) {
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("ошибка запроса к Spotify: %s", string(body))
+		return nil, fmt.Errorf("failed Spotify API request: %s", string(body))
 	}
 
 	var album entity.SpotifyAlbum

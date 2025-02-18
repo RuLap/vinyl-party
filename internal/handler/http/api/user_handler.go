@@ -8,6 +8,8 @@ import (
 	user_mapper "vinyl-party/internal/mapper/custom/user"
 	"vinyl-party/internal/service"
 	"vinyl-party/pkg/jwt_helper"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type UserHandler struct {
@@ -50,7 +52,7 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	token, err := jwt_helper.GenerateJWT(user.ID, user.Email)
 	if err != nil {
-		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+		http.Error(w, "Ошибка генерации токена", http.StatusInternalServerError)
 		return
 	}
 
@@ -68,4 +70,24 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(loginResponseDTO)
+}
+
+func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		http.Error(w, "Неверный идентификатор пользователя", http.StatusBadRequest)
+		return
+	}
+
+	user, err := h.userService.GetByID(r.Context(), id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	userDTO := user_mapper.EntityToInfoDTO(user)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(userDTO)
 }

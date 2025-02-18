@@ -51,7 +51,7 @@ func (h *PartyHandler) CreateParty(w http.ResponseWriter, r *http.Request) {
 func (h *PartyHandler) GetParty(w http.ResponseWriter, r *http.Request) {
 	partyID := chi.URLParam(r, "id")
 	if partyID == "" {
-		http.Error(w, "PartyID не найден", http.StatusBadRequest)
+		http.Error(w, "Неверный идентификатор вечеринки", http.StatusBadRequest)
 		return
 	}
 
@@ -68,13 +68,13 @@ func (h *PartyHandler) GetParty(w http.ResponseWriter, r *http.Request) {
 func (h *PartyHandler) GetUserParties(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "id")
 	if userID == "" {
-		http.Error(w, "UserID not found", http.StatusBadRequest)
+		http.Error(w, "Неверный идентификатор пользователя", http.StatusBadRequest)
 		return
 	}
 
 	statusStr := r.URL.Query().Get("status")
 	if statusStr != "" && !entity.IsValidPartyStatus(statusStr) {
-		http.Error(w, "Invalid party status", http.StatusBadRequest)
+		http.Error(w, "Неверный статус", http.StatusBadRequest)
 		return
 	}
 	var status entity.PartyStatus
